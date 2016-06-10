@@ -135,34 +135,29 @@ public class MessageHandler {
     public void onConnected(Channel channel) {
         this.mChannel = channel;
         //绑定设备
-        String deviceid = ((ClientApplication) ClientApplication.instance()).getDeviceId();
+        String clientId = ((ClientApplication) ClientApplication.instance()).getClientId();
         Message.Data.Builder data = Message.Data.newBuilder();
         data.setCmd(Cmd.BIND_CLIENT_VALUE);
-        data.setContent(deviceid);
+        data.setClientId(clientId);
         data.setCreateTime(System.currentTimeMillis());
         handSendMsg(data);
-        ConcurrentHashMap<Long, Message.Data.Builder> mQueue = this.mQueue;
-        Set<Map.Entry<Long, Message.Data.Builder>> entries = mQueue.entrySet();
-        for (Map.Entry<Long, Message.Data.Builder> entry : entries) {
-            handSendMsg(entry.getValue());
-        }
     }
 
     private void proccessSendMessage(Message.Data.Builder data) {
         Log.i("proccess Send Message=====>>=====>>cmd[" + data.getCmd());
         push(data);
         switch (data.getCmd()) {
+            case Cmd.BIND_CLIENT_VALUE:
+                Log.i("is bind device message [" + data.getClientId());
+                break;
             case Cmd.LOGIN_VALUE:
                 Log.i("is login message account[" + data.getSender());
                 break;
             case Cmd.HEARTBEAT_VALUE:
                 Log.i("is hearbreak mesage  time[" + data.getCreateTime());
                 break;
-            case Cmd.CHAT_MSG_VALUE:
+            case Cmd.CHAT_TXT_VALUE:
                 Log.i("is nomal chat message   [" + data.getContent());
-                break;
-            case Cmd.BIND_CLIENT_VALUE:
-                Log.i("is bind device message [" + data.getContent());
                 break;
         }
     }
@@ -173,6 +168,9 @@ public class MessageHandler {
     public void proccessReceiveMsg(Message.Data data, ClientHandler.IMEventListener listener) {
         Log.i("处理收到消息<<======<<======cmd[" + data.getCmd());
         switch (data.getCmd()) {
+            case Cmd.BIND_CLIENT_VALUE:
+                Log.i("绑定client ok");
+                break;
             case Cmd.LOGIN_VALUE:
                 if (TextUtils.isEmpty(data.getSender())) {
                     Log.i("服务端登录请求    msg[" + data.getContent());
@@ -196,16 +194,16 @@ public class MessageHandler {
                 //移除心跳消息
                 pop(data.getCreateTime());
                 break;
-            case Cmd.CHAT_MSG_VALUE:
+            case Cmd.CHAT_TXT_VALUE:
                 Log.i("收到聊天消息");
                 listener.onReceiveMessage(data);
                 break;
-            case Message.Data.Cmd.CHAT_MSG_ECHO_VALUE:
+            case Message.Data.Cmd.CHAT_TXT_ECHO_VALUE:
                 Log.i("消息回应,发送成功   time[" + data.getCreateTime());
                 Message.Data.Builder pop = pop(data.getCreateTime());
                 if (pop != null) {
                     Log.i("createTime:" + data.getCreateTime() + "==pop:" + pop.getContent());
-                    pop.setCmd(Cmd.CHAT_MSG_ECHO_VALUE);
+                    pop.setCmd(Cmd.CHAT_TXT_ECHO_VALUE);
                     //移除发送消息
                     IMClient.instance().onSendSucceed(pop);
                 }

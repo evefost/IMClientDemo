@@ -71,7 +71,7 @@ public class RecentFragment extends BaseFragment implements ClientHandler.IMEven
         Message.Data.Builder data = null;
         for (int i = 0; i < 50; i++) {
             data = Message.Data.newBuilder();
-            data.setCmd(Message.Data.Cmd.CHAT_MSG_VALUE);
+            data.setCmd(Message.Data.Cmd.CHAT_TXT_VALUE);
             Random random = new Random();
             boolean b = random.nextBoolean();
             if (b) {

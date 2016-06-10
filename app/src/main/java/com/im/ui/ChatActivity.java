@@ -87,7 +87,7 @@ public class ChatActivity extends BaseActivity implements ClientHandler.IMEventL
             @Override
             public void onClick(View v) {
                 Message.Data.Builder msg = Message.Data.newBuilder();
-                msg.setCmd(Message.Data.Cmd.CHAT_MSG_VALUE);
+                msg.setCmd(Message.Data.Cmd.CHAT_TXT_VALUE);
                 msg.setCreateTime(System.currentTimeMillis());
                 msg.setSender(mApp.getUid());
                 msg.setReceiver(receiverId);
@@ -108,7 +108,7 @@ public class ChatActivity extends BaseActivity implements ClientHandler.IMEventL
         Message.Data.Builder data = null;
         for (int i = 0; i < 50; i++) {
             data = Message.Data.newBuilder();
-            data.setCmd(Message.Data.Cmd.CHAT_MSG_VALUE);
+            data.setCmd(Message.Data.Cmd.CHAT_TXT_VALUE);
             Random random = new Random();
             boolean b = random.nextBoolean();
             if (b) {
@@ -145,7 +145,7 @@ public class ChatActivity extends BaseActivity implements ClientHandler.IMEventL
 
     @Override
     public void onReceiveMessage(Message.Data msg) {
-        if(msg.getCmd() == Message.Data.Cmd.CHAT_MSG_VALUE){
+        if(msg.getCmd() == Message.Data.Cmd.CHAT_TXT_VALUE){
             LocalMessage localMessage = new LocalMessage(msg);
             messageList.add(localMessage);
             mAdapter.notifyDataSetChanged();

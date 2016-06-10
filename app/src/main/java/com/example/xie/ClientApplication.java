@@ -7,6 +7,7 @@ import android.util.Log;
 
 import com.examp.bean.User;
 import com.im.sdk.core.IMClient;
+import com.xy.util.MD5Util;
 
 import java.util.UUID;
 
@@ -47,10 +48,6 @@ public class ClientApplication extends Application {
 
     }
 
-    public String getDeviceId(){
-        TelephonyManager manager = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
-        return manager.getDeviceId();
-    }
 
     public User getmUser() {
         return mUser;
@@ -74,6 +71,13 @@ public class ClientApplication extends Application {
         } else {
             return false;
         }
+    }
+
+
+    public String getClientId() {
+        TelephonyManager manager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+        String clientId = MD5Util.MD5(manager.getDeviceId());
+        return clientId;
     }
 
 }

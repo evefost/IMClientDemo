@@ -104,7 +104,7 @@ public class Mefragment extends BaseFragment implements ClientHandler.IMEventLis
         Log.i( "onSendFailure");
         if (msg.getCmd() == Message.Data.Cmd.LOGIN_VALUE) {
             Log.i( "登录失败");
-        } else if (msg.getCmd() == Message.Data.Cmd.CHAT_MSG_VALUE) {
+        } else if (msg.getCmd() == Message.Data.Cmd.CHAT_TXT_VALUE) {
 
         }
     }
@@ -117,7 +117,7 @@ public class Mefragment extends BaseFragment implements ClientHandler.IMEventLis
             if ("1".equals(msg.getContent())) {
                 login_status.setText("已登录");
             }
-        } else if (msg.getCmd() == Message.Data.Cmd.CHAT_MSG_ECHO_VALUE) {
+        } else if (msg.getCmd() == Message.Data.Cmd.CHAT_TXT_ECHO_VALUE) {
             Log.i( "发送成功");
 
         }
