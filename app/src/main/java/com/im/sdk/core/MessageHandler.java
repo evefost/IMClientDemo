@@ -10,7 +10,6 @@ import com.im.sdk.protocol.Message.Data.Cmd;
 import com.xy.util.Log;
 
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 
@@ -165,7 +164,7 @@ public class MessageHandler {
     /**
      * 所有消息的接收在这处理
      */
-    public void proccessReceiveMsg(Message.Data data, ClientHandler.IMEventListener listener) {
+    public void proccessReceiveMsg(Message.Data data) {
         Log.i("处理收到消息<<======<<======cmd[" + data.getCmd());
         switch (data.getCmd()) {
             case Cmd.BIND_CLIENT_VALUE:
@@ -174,7 +173,6 @@ public class MessageHandler {
             case Cmd.LOGIN_VALUE:
                 if (TextUtils.isEmpty(data.getSender())) {
                     Log.i("服务端登录请求    msg[" + data.getContent());
-                    listener.onReceiveMessage(data);
                 } else {
                     Log.i("登录结果 LoginSuccess[" + data.getContent());
                     //移除发送消息
@@ -187,7 +185,6 @@ public class MessageHandler {
                 break;
             case Cmd.OTHER_LOGGIN_VALUE:
                 Log.i("帐号别处登录     account[" + data.getSender());
-                listener.onReceiveMessage(data);
                 break;
             case Cmd.HEARTBEAT_VALUE:
                 Log.i("心跳回应                [" + data.getCreateTime());
@@ -196,7 +193,6 @@ public class MessageHandler {
                 break;
             case Cmd.CHAT_TXT_VALUE:
                 Log.i("收到聊天消息");
-                listener.onReceiveMessage(data);
                 break;
             case Message.Data.Cmd.CHAT_TXT_ECHO_VALUE:
                 Log.i("消息回应,发送成功   time[" + data.getCreateTime());
@@ -211,7 +207,6 @@ public class MessageHandler {
             case Cmd.MINE_FRIENDS_VALUE:
                 Log.i("消息回应,好友列表" + data.getContent());
                 Message.Data.Builder pop2 = pop(data.getCreateTime());
-                listener.onReceiveMessage(data);
                 break;
         }
     }

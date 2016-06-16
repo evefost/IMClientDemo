@@ -131,7 +131,7 @@ public final class IMClient implements ClientHandler.IMEventListener {
                     connect_status = STATU_CONNECTED;
                     return;
                 }
-                Log.i("start connect server:" + Constants.SOCKET_HOST+":"+ Constants.SOCKET_PORT);
+                Log.i("start connect server:" + Constants.SOCKET_HOST + ":" + Constants.SOCKET_PORT);
                 ChannelFuture f;
                 try {
                     connect_status = STATU_CONNECTING;
@@ -239,6 +239,10 @@ public final class IMClient implements ClientHandler.IMEventListener {
         mUIhander.post(new Runnable() {
             @Override
             public void run() {
+                if (event == EVENT_RECEIVE_MESSAGE) {
+                    Log.i("收到消息，处理各类消息");
+                    mMessageHandler.proccessReceiveMsg((Message.Data) message);
+                }
                 for (ClientHandler.IMEventListener listener : mIMEventListener) {
                     if (event == EVENT_CONNECTED) {
                         Log.i("连接成功能");
@@ -247,8 +251,7 @@ public final class IMClient implements ClientHandler.IMEventListener {
                         Log.i("服务器已断开");
                         listener.onDisconnected(isException);
                     } else if (event == EVENT_RECEIVE_MESSAGE) {
-                        Log.i("收到消息，处理各类消息");
-                        mMessageHandler.proccessReceiveMsg((Message.Data) message, listener);
+                        listener.onReceiveMessage((Message.Data) message);
                     } else if (event == EVENT_SEND_FAILURE) {
                         Log.i("发送失败");
                         listener.onSendFailure((Message.Data.Builder) message);

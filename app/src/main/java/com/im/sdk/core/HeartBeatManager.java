@@ -8,7 +8,9 @@ import android.content.Intent;
 import android.content.IntentFilter;
 
 import com.example.xie.ClientApplication;
+import com.google.protobuf.ByteString;
 import com.im.sdk.protocol.Message;
+import com.mdroid.xxtea.Tea;
 import com.xy.util.Log;
 
 
@@ -30,7 +32,14 @@ public class HeartBeatManager {
             if (action.equals(ACTION_SENDING_HEARTBEAT)) {
                 Log.d( "发送心跳包");
                 Message.Data.Builder data = Message.Data.newBuilder();
+                String content = "abc";
+                String key = "123";
+                byte[] enBytes = Tea.encrypt(content.getBytes(), key.getBytes());
+                //byte[] deBytes = Tea.decrypt(new String(enBytes).getBytes(),key.getBytes());
+                //Log.i("src content:"+new String(deBytes));
                 data.setCmd(Message.Data.Cmd.HEARTBEAT_VALUE);
+                data.setContent(new String(enBytes));
+                data.setBody(ByteString.copyFrom(enBytes));
                 IMClient.instance().sendMessage(data);
             }
         }
