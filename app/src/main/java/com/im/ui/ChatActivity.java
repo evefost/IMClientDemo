@@ -7,6 +7,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.common.ui.base.BaseActivity;
@@ -20,6 +21,10 @@ import com.xy.util.Log;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.UUID;
+
+import butterknife.InjectView;
+import butterknife.OnClick;
 
 /**
  * Created by xie on 2016/2/1.
@@ -27,149 +32,145 @@ import java.util.Random;
 public class ChatActivity extends BaseActivity implements ClientHandler.IMEventListener {
 
 
+    @InjectView(R.id.rcView)
+    RecyclerView mRcView;
+    @InjectView(R.id.et_input)
+    EditText mEtInput;
+    @InjectView(R.id.tv_send)
+    TextView mTvSend;
+    @InjectView(R.id.rl_input)
+    RelativeLayout mRlInput;
+    @InjectView(R.id.tv_connect_state)
+    TextView mTvConnectState;
+    String content = "这是测试内容这是测试容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测试内容这是测试内容容这这是测试内容这是测试内容容这这是测试内容这是测试内容容这是测试内容这是测试内容容这是测试内容这是测试内容容这是测试内容这是测试内容容这是测试内容这是测试内容容这是测试内容这是测试内测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测试内容这是测试内容容这这是测试内容这是测试内容容这这是测试内容这是测试内容容这是测试内容这是测试内容容这是测试内容这是测试内容容这是测试内容这是测试内容容这是测试内容这是测试内容容这是测试内容这是测试内测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测试内容这是测试内容容这这是测试内容这是测试内容容这这是测试内容这是测试内容容这是测试内容这是测试内容容这是测试内容这是测试内容容这是测试内容这是测试内容容这是测试内容这是测试内容容这是测试内容这是测试内测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测试内容这是测试内容容这这是测试内容这是测试内容容这这是测试内容这是测试内容容这是测试内容这是测试内容容这是测试内容这是测试内容容这是测试内容这是测试内容容这是测试内容这是测试内容容这是测试内容这是测试内容内容这是测试内容这是测试内容这是测试内容这是测试内容这是测试内容这是测试内容这是测试内容这是测试内容这是测试内容这是测试内容";
+    List<LocalMessage> messageList = new ArrayList<LocalMessage>();
+    private ChatAdapter mAdapter;
+    private String receiverId;
+
     public static void lauchActivity(Activity activity, String uid) {
         Intent intent = new Intent(activity.getApplicationContext(), ChatActivity.class);
-        intent.putExtra("uid",uid);
+        intent.putExtra("uid", uid);
         activity.startActivity(intent);
     }
 
-    String content ="这是测试内容这是测试容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测试内容这是测试内容容这这是测试内容这是测试内容容这这是测试内容这是测试内容容这是测试内容这是测试内容容这是测试内容这是测试内容容这是测试内容这是测试内容容这是测试内容这是测试内容容这是测试内容这是测试内测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测试内容这是测试内容容这这是测试内容这是测试内容容这这是测试内容这是测试内容容这是测试内容这是测试内容容这是测试内容这是测试内容容这是测试内容这是测试内容容这是测试内容这是测试内容容这是测试内容这是测试内测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测试内容这是测试内容容这这是测试内容这是测试内容容这这是测试内容这是测试内容容这是测试内容这是测试内容容这是测试内容这是测试内容容这是测试内容这是测试内容容这是测试内容这是测试内容容这是测试内容这是测试内测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测试内容这是测试内容容这这是测试内容这是测试内容容这这是测试内容这是测试内容容这是测试内容这是测试内容容这是测试内容这是测试内容容这是测试内容这是测试内容容这是测试内容这是测试内容容这是测试内容这是测试内容内容这是测试内容这是测试内容这是测试内容这是测试内容这是测试内容这是测试内容这是测试内容这是测试内容这是测试内容这是测试内容";
     @Override
     public int getLayoutId() {
         return R.layout.chat_layout;
     }
 
-    private RecyclerView rcView;
-    private EditText et_input;
-    private TextView tv_send;
-    private TextView tv_connect_state;
-    @Override
-    public void findViews() {
-
-        tv_connect_state = (TextView) findViewById(R.id.tv_connect_state);
-
-        rcView = (RecyclerView) findViewById(R.id.rcView);
-        et_input = (EditText) findViewById(R.id.et_input);
-        tv_send = (TextView) findViewById(R.id.tv_send);
-    }
-
-    private ChatAdapter mAdapter;
-    List<LocalMessage> messageList = new ArrayList<LocalMessage>();
-
-    private String receiverId;
-
     @Override
     public void init(Bundle savedInstanceState) {
         IMClient.instance().registIMEventListener(this);
-        receiverId = getIntent().getStringExtra("uid")==null?"":getIntent().getStringExtra("uid");
+        receiverId = getIntent().getStringExtra("uid") == null ? "" : getIntent().getStringExtra("uid");
         setTitle("与" + receiverId);
-        tv_connect_state.setText(IMClient.instance().isConnecting()?"连接中...":"服务器已断开..");
-        tv_connect_state.setVisibility(IMClient.instance().isConnected() ? View.GONE : View.VISIBLE);
-
-
-        mAdapter = new ChatAdapter(mContext,messageList);
-        rcView.setLayoutManager(new LinearLayoutManager(mActivity));
-        rcView.setAdapter(mAdapter);
-        loadLocalMessages();
+        mTvConnectState.setText(IMClient.instance().isConnecting() ? "连接中..." : "服务器已断开..");
+        mTvConnectState.setVisibility(IMClient.instance().isConnected() ? View.GONE : View.VISIBLE);
+        mAdapter = new ChatAdapter(mContext, messageList);
+        mRcView.setLayoutManager(new LinearLayoutManager(mActivity));
+        mRcView.setAdapter(mAdapter);
+        //loadLocalMessages();
         mAdapter.notifyDataSetChanged();
 
     }
 
     @Override
-    public void  onDestroy(){
+    public void onDestroy() {
         super.onDestroy();
         IMClient.instance().unRegistIMEventListener(this);
     }
-    @Override
-    public void setListeners() {
-        super.setListeners();
-        tv_send.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+
+
+    @OnClick({R.id.tv_send})
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.tv_send:
                 Message.Data.Builder msg = Message.Data.newBuilder();
+                msg.setId(UUID.randomUUID().toString());
                 msg.setCmd(Message.Data.Cmd.CHAT_TXT_VALUE);
                 msg.setCreateTime(System.currentTimeMillis());
-                msg.setSender(mApp.getUid());
-                msg.setReceiver(receiverId);
-                String ct = et_input.getText().toString().trim();
+                msg.setSenderId(mApp.getUid());
+                msg.setReceiverId(receiverId);
+                String ct = mEtInput.getText().toString().trim();
                 msg.setContent(ct);
-                et_input.setText("");
+                mEtInput.setText("");
                 LocalMessage localMessage = new LocalMessage(msg);
-             ;
                 IMClient.instance().sendMessage(msg);
                 messageList.add(localMessage);
                 mAdapter.notifyDataSetChanged();
-                rcView.scrollToPosition(messageList.size()-1);
-            }
-        });
+                mRcView.scrollToPosition(messageList.size() - 1);
+                break;
+        }
+
     }
 
     private void loadLocalMessages() {
         Message.Data.Builder data = null;
         for (int i = 0; i < 50; i++) {
             data = Message.Data.newBuilder();
+            data.setId(UUID.randomUUID().toString());
             data.setCmd(Message.Data.Cmd.CHAT_TXT_VALUE);
             Random random = new Random();
             boolean b = random.nextBoolean();
             if (b) {
-                data.setSender(mApp.getUid());
+                data.setSenderId(mApp.getUid());
             } else {
-                data.setSender(receiverId);
+                data.setSenderId(receiverId);
             }
-            String ct = content.substring(0,random.nextInt(50));
+            String ct = content.substring(0, random.nextInt(50));
             data.setContent(ct + i);
             data.setCreateTime(System.currentTimeMillis());
             LocalMessage localMessage = new LocalMessage(data);
             messageList.add(localMessage);
 
-
         }
-    }
-
-
-    @Override
-    public void onSendFailure(Message.Data.Builder msg) {
-
-    }
-
-    @Override
-    public void onSendSucceed(Message.Data.Builder msg) {
-
-    }
-
-    @Override
-    public void onConnectFailure(String msg) {
-        tv_connect_state.setText("连接失败..");
-        tv_connect_state.setVisibility(View.VISIBLE);
     }
 
     @Override
     public void onReceiveMessage(Message.Data msg) {
-        if(msg.getCmd() == Message.Data.Cmd.CHAT_TXT_VALUE){
+        if (msg.getCmd() == Message.Data.Cmd.CHAT_TXT_VALUE) {
             LocalMessage localMessage = new LocalMessage(msg);
             messageList.add(localMessage);
             mAdapter.notifyDataSetChanged();
         }
     }
 
+
+    @Override
+    public void onSendFailure(Message.Data.Builder msg) {
+        mAdapter.updateMsgStatus(msg.getId(), LocalMessage.STATUS_FAILURE);
+    }
+
+    @Override
+    public void onSendSucceed(Message.Data.Builder msg) {
+        mAdapter.updateMsgStatus(msg.getId(), LocalMessage.STATUS_SUCCESS);
+    }
+
+
+    @Override
+    public void onConnectFailure(String msg) {
+        mTvConnectState.setText("连接失败..");
+        mTvConnectState.setVisibility(View.VISIBLE);
+    }
+
+
     @Override
     public void onConnected() {
-        tv_connect_state.setVisibility(View.GONE);
+        mTvConnectState.setVisibility(View.GONE);
     }
 
     @Override
     public void onDisconnected(boolean isException) {
         Log.i("onDisconnected");
-        tv_connect_state.setText("服务器已断开..");
-        tv_connect_state.setVisibility(View.VISIBLE);
+        mTvConnectState.setText("服务器已断开..");
+        mTvConnectState.setVisibility(View.VISIBLE);
     }
+
     @Override
     public void onConnecting() {
         Log.i("onConnecting");
-        tv_connect_state.setText("连接中..");
-        tv_connect_state.setVisibility(View.VISIBLE);
+        mTvConnectState.setText("连接中..");
+        mTvConnectState.setVisibility(View.VISIBLE);
     }
-
 
 
 }

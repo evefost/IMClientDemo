@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -15,6 +14,7 @@ import android.widget.TextView;
 
 import com.example.xie.ClientApplication;
 import com.example.xie.imclient.R;
+import com.zhy.autolayou.AutoLayoutActivity;
 
 import java.io.Serializable;
 
@@ -23,7 +23,7 @@ import butterknife.ButterKnife;
 /**
  * Created by xie on 2016/2/1.
  */
-public abstract class BaseActivity  extends AppCompatActivity implements PageInterface{
+public abstract class BaseActivity extends AutoLayoutActivity implements PageInterface {
 
     protected ClientApplication mApp;
     protected  Context mContext = null;
@@ -132,5 +132,10 @@ public abstract class BaseActivity  extends AppCompatActivity implements PageInt
     }
 
 
+    @Override
+    protected void onDestroy() {
+        ButterKnife.reset(this);
+        super.onDestroy();
 
+    }
 }

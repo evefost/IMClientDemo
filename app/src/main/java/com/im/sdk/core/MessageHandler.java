@@ -10,6 +10,7 @@ import com.im.sdk.protocol.Message.Data.Cmd;
 import com.xy.util.Log;
 
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 
@@ -136,6 +137,7 @@ public class MessageHandler {
         //绑定设备
         String clientId = ((ClientApplication) ClientApplication.instance()).getClientId();
         Message.Data.Builder data = Message.Data.newBuilder();
+        data.setId(UUID.randomUUID().toString());
         data.setCmd(Cmd.BIND_CLIENT_VALUE);
         data.setClientId(clientId);
         data.setCreateTime(System.currentTimeMillis());
@@ -150,7 +152,7 @@ public class MessageHandler {
                 Log.i("is bind device message [" + data.getClientId());
                 break;
             case Cmd.LOGIN_VALUE:
-                Log.i("is login message account[" + data.getSender());
+                Log.i("is login message account[" + data.getSenderId());
                 break;
             case Cmd.HEARTBEAT_VALUE:
                 Log.i("is hearbreak mesage  time[" + data.getCreateTime());
@@ -171,7 +173,7 @@ public class MessageHandler {
                 Log.i("绑定client ok");
                 break;
             case Cmd.LOGIN_VALUE:
-                if (TextUtils.isEmpty(data.getSender())) {
+                if (TextUtils.isEmpty(data.getSenderId())) {
                     Log.i("服务端登录请求    msg[" + data.getContent());
                 } else {
                     Log.i("登录结果 LoginSuccess[" + data.getContent());
@@ -184,7 +186,7 @@ public class MessageHandler {
                 }
                 break;
             case Cmd.OTHER_LOGGIN_VALUE:
-                Log.i("帐号别处登录     account[" + data.getSender());
+                Log.i("帐号别处登录     account[" + data.getSenderId());
                 break;
             case Cmd.HEARTBEAT_VALUE:
                 Log.i("心跳回应                [" + data.getCreateTime());

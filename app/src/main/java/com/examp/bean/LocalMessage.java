@@ -10,7 +10,11 @@ public class LocalMessage {
 
     public static final  int RECIEVE_MSG = 0;
     public static final  int SEND_MSG = 1;
+    public static int STATUS_SEND_ING = 0;
+    public static int STATUS_SUCCESS = 1;
+    public static int STATUS_FAILURE = -1;
 
+    private int status;
     private Message.Data data;
 
     private LocalMessage() {
@@ -25,6 +29,13 @@ public class LocalMessage {
         this.data = data.build();
     }
 
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
+    }
 
     public Message.Data getData() {
         return data;
@@ -34,8 +45,8 @@ public class LocalMessage {
         this.data = data;
     }
 
-    public boolean isComMeg(){
-        if (data.getSender().equals(((ClientApplication) ClientApplication.instance()).getUid())) {
+    public boolean isComMsg() {
+        if (data.getSenderId().equals(((ClientApplication) ClientApplication.instance()).getUid())) {
             return false;
         } else {
             return true;

@@ -14,13 +14,11 @@ import com.im.sdk.core.IMClient;
 import com.im.sdk.protocol.Message;
 import com.xy.util.Log;
 
+import java.util.UUID;
+
 public class Mefragment extends BaseFragment implements ClientHandler.IMEventListener, View.OnClickListener {
 
-    @Override
-    public int getLayoutId() {
-        return R.layout.me_fragment_layout;
-    }
-
+    int sentcont = 0;
     private TextView tv_status;
     private Button btn_connect;
     private Button btn_disconnect;
@@ -29,6 +27,11 @@ public class Mefragment extends BaseFragment implements ClientHandler.IMEventLis
     private Button bt_login;
     private Button logout;
     private Button login_status;
+
+    @Override
+    public int getLayoutId() {
+        return R.layout.me_fragment_layout;
+    }
 
     @Override
     public void findViews() {
@@ -52,9 +55,6 @@ public class Mefragment extends BaseFragment implements ClientHandler.IMEventLis
 
     }
 
-
-    int sentcont = 0;
-
     @Override
     public void setListeners() {
         btn_connect.setOnClickListener(this);
@@ -67,13 +67,14 @@ public class Mefragment extends BaseFragment implements ClientHandler.IMEventLis
     public void onReceiveMessage(Message.Data msg) {
 
         Log.i( "data cmd[" + msg.getCmd() + "]id[" + msg.getId() + "]username[" + msg.getContent());
-        if (msg.getCmd() == Message.Data.Cmd.LOGIN_VALUE && TextUtils.isEmpty(msg.getSender())) {
+        if (msg.getCmd() == Message.Data.Cmd.LOGIN_VALUE && TextUtils.isEmpty(msg.getSenderId())) {
             //未登录，登录
             Log.i( "未登录，登录");
             login_status.setText("未登录");
             Message.Data.Builder accountInfo = Message.Data.newBuilder();
+            accountInfo.setId(UUID.randomUUID().toString());
             accountInfo.setCmd(Message.Data.Cmd.LOGIN_VALUE);
-            accountInfo.setSender(mApp.getUid());
+            accountInfo.setSenderId(mApp.getUid());
             //IMClient.instance().sendMessage(accountInfo);
         }
 
@@ -150,13 +151,15 @@ public class Mefragment extends BaseFragment implements ClientHandler.IMEventLis
                 break;
             case R.id.bt_login:
                 Message.Data.Builder accountInfo = Message.Data.newBuilder();
+                accountInfo.setId(UUID.randomUUID().toString());
                 accountInfo.setCmd(Message.Data.Cmd.LOGIN_VALUE);
-                accountInfo.setSender(mApp.getUid());
+                accountInfo.setSenderId(mApp.getUid());
                 IMClient.instance().sendMessage(accountInfo);
                 break;
 
             case R.id.logout:
                 Message.Data.Builder data = Message.Data.newBuilder();
+                data.setId(UUID.randomUUID().toString());
                 data.setCmd(Message.Data.Cmd.LOGOUT_VALUE);
                 IMClient.instance().sendMessage(data);
                 break;

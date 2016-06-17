@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
-              android:orientation="vertical"
               android:background="@drawable/selector_bg_item"
+    android:orientation="vertical"
               >
 
     <RelativeLayout
-        android:padding="20px"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:padding="20px"
         >
 
         <ImageView
@@ -69,6 +69,6 @@
     </RelativeLayout>
 <View
     android:layout_width="match_parent"
-    android:background="#999999"
-    android:layout_height="1px"/>
-</LinearLayout>
+    android:layout_height="1px"
+    android:background="#999999" />
+</RelativeLayout>
