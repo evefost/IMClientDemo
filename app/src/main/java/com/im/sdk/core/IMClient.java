@@ -64,6 +64,7 @@ public final class IMClient implements ClientHandler.IMEventListener {
     private Handler mUIhander;
     private ExecutorService executor;
     private int reconectTimes = 3;
+    private OnBindListener mBindListner;
 
     private IMClient(Context ctx) {
         init();
@@ -241,7 +242,13 @@ public final class IMClient implements ClientHandler.IMEventListener {
             public void run() {
                 if (event == EVENT_RECEIVE_MESSAGE) {
                     Log.i("收到消息，处理各类消息");
-                    mMessageHandler.proccessReceiveMsg((Message.Data) message);
+                    Message.Data msg = (Message.Data) message;
+                    mMessageHandler.proccessReceiveMsg(msg);
+                    if (msg.getCmd() == Message.Data.Cmd.BIND_CLIENT_VALUE) {
+                        if (mBindListner != null) {
+                            mBindListner.onBind(msg.getEncriptKey());
+                        }
+                    }
                 }
                 for (ClientHandler.IMEventListener listener : mIMEventListener) {
                     if (event == EVENT_CONNECTED) {
@@ -272,5 +279,14 @@ public final class IMClient implements ClientHandler.IMEventListener {
 
     public void clearEventListener() {
         mIMEventListener.clear();
+    }
+
+    public void setOnBindListener(OnBindListener listener) {
+        this.mBindListner = listener;
+    }
+
+    public interface OnBindListener {
+        public void onBind(String encriptKey);
+
     }
 }

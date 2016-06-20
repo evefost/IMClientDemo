@@ -9,9 +9,9 @@ public class Constants {
     private static final int ENVIRONMENT_T = 1;  // 测试模式
     private static final int ENVIRONMENT_D = 2;  // 开发模式
     public static String HOST =
-            isT() ? "http://192.168.1.3" : isD() ? "http://192.168.60.91" : "https://192.168.60.91";
+            isT() ? "http://192.168.1.2" : isD() ? "http://192.168.60.91" : "https://192.168.60.91";
     public static String SOCKET_HOST =
-            isT() ? "192.168.1.3" : isD() ? "192.168.1.3" : "192.168.1.3";
+            isT() ? "192.168.1.2" : isD() ? "192.168.1.3" : "192.168.1.2";
 
     public static boolean isF() {
         return BuildConfig.serviceEnvironment == ENVIRONMENT_F;

@@ -3,10 +3,10 @@ package com.example.xie;
 import android.app.Application;
 import android.content.Context;
 import android.telephony.TelephonyManager;
-import android.util.Log;
 
 import com.examp.bean.User;
 import com.im.sdk.core.IMClient;
+import com.xy.util.Log;
 import com.xy.util.MD5Util;
 
 import java.util.UUID;
@@ -16,6 +16,7 @@ import java.util.UUID;
  */
 public class ClientApplication extends Application {
 
+    public static String mEncriptKey;
     private static Context instance;
     public User mUser;
     private String TAG = getClass().getSimpleName();
@@ -43,6 +44,13 @@ public class ClientApplication extends Application {
         mUser.setUid(uuid);
 
         IMClient.init(this);
+        IMClient.instance().setOnBindListener(new IMClient.OnBindListener() {
+            @Override
+            public void onBind(String encriptKey) {
+                Log.i("encriptKey:" + encriptKey);
+                mEncriptKey = encriptKey;
+            }
+        });
         IMClient.instance().connect();
 
 

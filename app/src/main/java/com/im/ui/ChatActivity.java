@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Base64;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
@@ -12,10 +13,12 @@ import android.widget.TextView;
 
 import com.common.ui.base.BaseActivity;
 import com.examp.bean.LocalMessage;
+import com.example.xie.ClientApplication;
 import com.example.xie.imclient.R;
 import com.im.sdk.core.ClientHandler;
 import com.im.sdk.core.IMClient;
 import com.im.sdk.protocol.Message;
+import com.mdroid.xxtea.Tea;
 import com.xy.util.Log;
 
 import java.util.ArrayList;
@@ -91,7 +94,11 @@ public class ChatActivity extends BaseActivity implements ClientHandler.IMEventL
                 msg.setSenderId(mApp.getUid());
                 msg.setReceiverId(receiverId);
                 String ct = mEtInput.getText().toString().trim();
-                msg.setContent(ct);
+                String key = ClientApplication.mEncriptKey;
+                msg.setContent(Base64.encodeToString(Tea.encrypt(ct.getBytes(), key.getBytes()), Base64.DEFAULT));
+                msg.setIsEncript(true);
+                msg.setEncriptKey(key);
+
                 mEtInput.setText("");
                 LocalMessage localMessage = new LocalMessage(msg);
                 IMClient.instance().sendMessage(msg);
