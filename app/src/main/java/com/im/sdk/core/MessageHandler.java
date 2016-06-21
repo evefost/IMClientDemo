@@ -1,6 +1,5 @@
 package com.im.sdk.core;
 
-import android.content.Context;
 import android.os.Handler;
 import android.text.TextUtils;
 
@@ -14,21 +13,17 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 
-import io.netty.channel.Channel;
-
 /**
  * Created by xie on 2016/1/31.
  * 处理所有消息的发送接收
  */
 public class MessageHandler {
 
-    public static long timeOut = 30 * 1000;
+    public static long timeOut = 12 * 1000;
     private static MessageHandler instance = new MessageHandler();
-    ConcurrentHashMap<Long, Message.Data.Builder> mQueue = new ConcurrentHashMap<>();
-    private Context context = ClientApplication.instance();
+    ConcurrentHashMap<String, Message.Data.Builder> mQueue = new ConcurrentHashMap<>();
     private Handler timerHandler = new Handler();
     private ExecutorService mExecutor;
-    private Channel mChannel;
     private boolean looping = false;
     private boolean isStopLoop = false;
 
@@ -63,8 +58,8 @@ public class MessageHandler {
     private void checkTimeOutMessage() {
         Log.i("checkTimeOutMessage size[ " + mQueue.size() + " ]");
         long currentTime = System.currentTimeMillis();
-        for (Map.Entry<Long, Message.Data.Builder> entry : mQueue.entrySet()) {
-            Long timeStrart = entry.getKey();
+        for (Map.Entry<String, Message.Data.Builder> entry : mQueue.entrySet()) {
+            long timeStrart = entry.getValue().getCreateTime();
             long time = currentTime - timeStrart;
             if (time >= timeOut) {
                 IMClient.instance().onSendFailure(entry.getValue());
@@ -74,18 +69,16 @@ public class MessageHandler {
         }
     }
 
-    /**
-     * 缓存消息，发送成功或失败,超时，时移除
-     */
+
     public void push(Message.Data.Builder msg) {
-        if (msg != null && msg.getCreateTime() != 0L) {
-            mQueue.put(msg.getCreateTime(), msg);
+        if (msg != null) {
+            mQueue.put(msg.getId(), msg);
         }
     }
 
-    public Message.Data.Builder pop(Long key) {
-        if (key != null) {
-            return mQueue.remove(key);
+    public Message.Data.Builder pop(String msgId) {
+        if (msgId != null) {
+            return mQueue.remove(msgId);
         }
         return null;
     }
@@ -102,14 +95,14 @@ public class MessageHandler {
                 if (IMClient.instance().isConnected()) {
                     try {
                         Log.e("message sending ...:" + msg);
-                        mChannel.writeAndFlush(msg);
+                        IMClient.instance().writeMsg(msg);
                         if (!isStopLoop && !looping) {
                             Log.i("start to checkTimeOut Messages");
                             loopMessage();
                         }
                     } catch (Exception e) {
                         Log.e("message send failue :" + e.toString());
-                        pop(msg.getCreateTime());
+                        pop(msg.getId());
                         if (msg.getCmd() != Cmd.HEARTBEAT_VALUE) {
                             //心跳消息不用通知
                             IMClient.instance().onSendFailure(msg);
@@ -132,8 +125,7 @@ public class MessageHandler {
     /**
      * 连接成功
      */
-    public void onConnected(Channel channel) {
-        this.mChannel = channel;
+    public void bindDevice() {
         //绑定设备
         String clientId = ((ClientApplication) ClientApplication.instance()).getClientId();
         Message.Data.Builder data = Message.Data.newBuilder();
@@ -149,16 +141,16 @@ public class MessageHandler {
         push(data);
         switch (data.getCmd()) {
             case Cmd.BIND_CLIENT_VALUE:
-                Log.i("is bind device message [" + data.getClientId());
+                Log.i("is bind device message ");
                 break;
             case Cmd.LOGIN_VALUE:
-                Log.i("is login message account[" + data.getSenderId());
+                Log.i("is login message");
                 break;
             case Cmd.HEARTBEAT_VALUE:
-                Log.i("is hearbreak mesage  time[" + data.getCreateTime());
+                Log.i("is hearbreak mesage");
                 break;
             case Cmd.CHAT_TXT_VALUE:
-                Log.i("is nomal chat message   [" + data.getContent());
+                Log.i("is nomal chat message");
                 break;
         }
     }
@@ -178,7 +170,7 @@ public class MessageHandler {
                 } else {
                     Log.i("登录结果 LoginSuccess[" + data.getContent());
                     //移除发送消息
-                    Message.Data.Builder pop = pop(data.getCreateTime());
+                    Message.Data.Builder pop = pop(data.getId());
                     if (pop != null) {
                         pop.setContent(data.getContent());
                         IMClient.instance().onSendSucceed(pop);
@@ -191,14 +183,14 @@ public class MessageHandler {
             case Cmd.HEARTBEAT_VALUE:
                 Log.i("心跳回应                [" + data.getCreateTime());
                 //移除心跳消息
-                pop(data.getCreateTime());
+                pop(data.getId());
                 break;
             case Cmd.CHAT_TXT_VALUE:
                 Log.i("收到聊天消息");
                 break;
             case Message.Data.Cmd.CHAT_TXT_ECHO_VALUE:
-                Log.i("消息回应,发送成功   time[" + data.getCreateTime());
-                Message.Data.Builder pop = pop(data.getCreateTime());
+                Log.i("消息回应,发送成功   id[" + data.getId());
+                Message.Data.Builder pop = pop(data.getId());
                 if (pop != null) {
                     Log.i("createTime:" + data.getCreateTime() + "==pop:" + pop.getContent());
                     pop.setCmd(Cmd.CHAT_TXT_ECHO_VALUE);
@@ -208,7 +200,7 @@ public class MessageHandler {
                 break;
             case Cmd.MINE_FRIENDS_VALUE:
                 Log.i("消息回应,好友列表" + data.getContent());
-                Message.Data.Builder pop2 = pop(data.getCreateTime());
+                Message.Data.Builder pop2 = pop(data.getId());
                 break;
         }
     }

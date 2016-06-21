@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.Base64;
 import android.view.View;
 import android.widget.EditText;
@@ -23,7 +24,6 @@ import com.xy.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 import java.util.UUID;
 
 import butterknife.InjectView;
@@ -45,7 +45,6 @@ public class ChatActivity extends BaseActivity implements ClientHandler.IMEventL
     RelativeLayout mRlInput;
     @InjectView(R.id.tv_connect_state)
     TextView mTvConnectState;
-    String content = "这是测试内容这是测试容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测试内容这是测试内容容这这是测试内容这是测试内容容这这是测试内容这是测试内容容这是测试内容这是测试内容容这是测试内容这是测试内容容这是测试内容这是测试内容容这是测试内容这是测试内容容这是测试内容这是测试内测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测试内容这是测试内容容这这是测试内容这是测试内容容这这是测试内容这是测试内容容这是测试内容这是测试内容容这是测试内容这是测试内容容这是测试内容这是测试内容容这是测试内容这是测试内容容这是测试内容这是测试内测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测试内容这是测试内容容这这是测试内容这是测试内容容这这是测试内容这是测试内容容这是测试内容这是测试内容容这是测试内容这是测试内容容这是测试内容这是测试内容容这是测试内容这是测试内容容这是测试内容这是测试内测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测这这是测试内容这是测试内容容这这是测试内容这是测试内容容这这是测试内容这是测试内容容这这是测试内容这是测试内容容这是测试内容这是测试内容容这是测试内容这是测试内容容这是测试内容这是测试内容容这是测试内容这是测试内容容这是测试内容这是测试内容内容这是测试内容这是测试内容这是测试内容这是测试内容这是测试内容这是测试内容这是测试内容这是测试内容这是测试内容这是测试内容";
     List<LocalMessage> messageList = new ArrayList<LocalMessage>();
     private ChatAdapter mAdapter;
     private String receiverId;
@@ -71,7 +70,6 @@ public class ChatActivity extends BaseActivity implements ClientHandler.IMEventL
         mAdapter = new ChatAdapter(mContext, messageList);
         mRcView.setLayoutManager(new LinearLayoutManager(mActivity));
         mRcView.setAdapter(mAdapter);
-        //loadLocalMessages();
         mAdapter.notifyDataSetChanged();
 
     }
@@ -95,10 +93,13 @@ public class ChatActivity extends BaseActivity implements ClientHandler.IMEventL
                 msg.setReceiverId(receiverId);
                 String ct = mEtInput.getText().toString().trim();
                 String key = ClientApplication.mEncriptKey;
-                msg.setContent(Base64.encodeToString(Tea.encrypt(ct.getBytes(), key.getBytes()), Base64.DEFAULT));
-                msg.setIsEncript(true);
-                msg.setEncriptKey(key);
-
+                if (!TextUtils.isEmpty(key)) {
+                    msg.setContent(Base64.encodeToString(Tea.encrypt(ct.getBytes(), key.getBytes()), Base64.DEFAULT));
+                    msg.setIsEncript(true);
+                    msg.setEncriptKey(key);
+                } else {
+                    msg.setContent(ct);
+                }
                 mEtInput.setText("");
                 LocalMessage localMessage = new LocalMessage(msg);
                 IMClient.instance().sendMessage(msg);
@@ -110,27 +111,6 @@ public class ChatActivity extends BaseActivity implements ClientHandler.IMEventL
 
     }
 
-    private void loadLocalMessages() {
-        Message.Data.Builder data = null;
-        for (int i = 0; i < 50; i++) {
-            data = Message.Data.newBuilder();
-            data.setId(UUID.randomUUID().toString());
-            data.setCmd(Message.Data.Cmd.CHAT_TXT_VALUE);
-            Random random = new Random();
-            boolean b = random.nextBoolean();
-            if (b) {
-                data.setSenderId(mApp.getUid());
-            } else {
-                data.setSenderId(receiverId);
-            }
-            String ct = content.substring(0, random.nextInt(50));
-            data.setContent(ct + i);
-            data.setCreateTime(System.currentTimeMillis());
-            LocalMessage localMessage = new LocalMessage(data);
-            messageList.add(localMessage);
-
-        }
-    }
 
     @Override
     public void onReceiveMessage(Message.Data msg) {

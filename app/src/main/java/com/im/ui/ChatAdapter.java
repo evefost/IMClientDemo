@@ -47,6 +47,7 @@ public class ChatAdapter extends MultiItemCommonAdapter<LocalMessage> {
 
                 holder.setText(R.id.tv_message, msg);
                 holder.setVisible(R.id.progressbar, chatMessage.getStatus() == LocalMessage.STATUS_SEND_ING);
+                holder.setVisible(R.id.ic_failure, chatMessage.getStatus() == LocalMessage.STATUS_FAILURE);
                 break;
             case R.layout.chat_item_other_text:
                 holder.setText(R.id.tv_message, msg);

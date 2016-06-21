@@ -80,6 +80,7 @@ public final class IMClient implements ClientHandler.IMEventListener {
         return mInstance;
     }
 
+
     public static void registIMEventListener(ClientHandler.IMEventListener listener) {
         mIMEventListener.add(listener);
     }
@@ -182,6 +183,11 @@ public final class IMClient implements ClientHandler.IMEventListener {
         return false;
     }
 
+    public void writeMsg(Object obj) {
+        if (channel != null && channel.isActive()) {
+            channel.writeAndFlush(obj);
+        }
+    }
     @Override
     public void onReceiveMessage(final Message.Data message) {
         Log.i(" onReceiveMessage ");
@@ -195,7 +201,7 @@ public final class IMClient implements ClientHandler.IMEventListener {
         connect_status = STATU_CONNECTED;
         Log.i(" onConnected ");
         notifyListener(false, null, EVENT_CONNECTED);
-        mMessageHandler.onConnected(channel);
+        mMessageHandler.bindDevice();
     }
 
     @Override
