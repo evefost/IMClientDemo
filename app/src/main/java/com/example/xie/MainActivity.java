@@ -4,16 +4,14 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.TabHost;
 import android.widget.TextView;
-
+import butterknife.InjectView;
+import butterknife.OnClick;
 import com.common.ui.base.BaseActivity;
 import com.common.ui.base.FragmentTabManager;
 import com.example.xie.imclient.R;
 import com.im.ui.ContactFragment;
 import com.im.ui.Mefragment;
 import com.im.ui.RecentFragment;
-
-import butterknife.InjectView;
-import butterknife.OnClick;
 
 /**
  * Created by xie on 2016/2/25.
@@ -30,13 +28,12 @@ public class MainActivity extends BaseActivity {
     TextView mTvContact;
     @InjectView(R.id.tv_me)
     TextView mTvMe;
+    FragmentTabManager mTabManager;
 
     @Override
     public int getLayoutId() {
         return R.layout.main_layout;
     }
-
-    FragmentTabManager mTabManager;
 
     @Override
     public void init(Bundle savedInstanceState) {

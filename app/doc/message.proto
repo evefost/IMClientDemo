@@ -1,0 +1,29 @@
+package com.im.sdk.protocol;
+option java_outer_classname = "Message";
+option java_package = "com.im.sdk.protocol";
+
+message Data {
+
+ required int32 cmd = 1;
+ required int64 create_time = 2;
+ optional string clientId = 3;
+ optional string id = 5;
+ optional string content = 6;
+ optional string sender = 7;
+ optional string receiver = 9;
+  enum Cmd {
+  
+	LOGIN=0;
+	LOGIN_ECHO=1;
+	LOGOUT=2;
+	LOGOUT_ECHO=3;
+	OTHER_LOGGIN=4;
+    	HEARTBEAT=5;
+    	CHAT_TXT=6;
+	CHAT_TXT_ECHO=7;
+	CHAT_OFFLINE_MSGS=8;
+	MINE_FRIENDS=9;
+	BIND_CLIENT=10;
+	}
+}
+

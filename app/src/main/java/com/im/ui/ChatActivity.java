@@ -2,6 +2,7 @@ package com.im.ui;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.net.sip.SipManager;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -11,7 +12,8 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-
+import butterknife.InjectView;
+import butterknife.OnClick;
 import com.common.ui.base.BaseActivity;
 import com.examp.bean.LocalMessage;
 import com.example.xie.ClientApplication;
@@ -21,19 +23,15 @@ import com.im.sdk.core.IMClient;
 import com.im.sdk.protocol.Message;
 import com.mdroid.xxtea.Tea;
 import com.xy.util.Log;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-
-import butterknife.InjectView;
-import butterknife.OnClick;
 
 /**
  * Created by xie on 2016/2/1.
  */
 public class ChatActivity extends BaseActivity implements ClientHandler.IMEventListener {
-
+    SipManager sm;
 
     @InjectView(R.id.rcView)
     RecyclerView mRcView;
