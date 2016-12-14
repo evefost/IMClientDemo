@@ -4,7 +4,7 @@ import com.example.xie.imclient.BuildConfig;
 
 public class Constants {
 
-    public static final int SOCKET_PORT = 53456;
+    public static final int SOCKET_PORT = 7777;
     private static final int ENVIRONMENT_F = 0;  // 生产模式
     private static final int ENVIRONMENT_T = 1;  // 测试模式
     private static final int ENVIRONMENT_D = 2;  // 开发模式

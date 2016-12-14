@@ -12,7 +12,7 @@ import com.google.protobuf.ByteString;
 import com.im.sdk.protocol.Message;
 import com.mdroid.xxtea.Tea;
 import com.xy.util.Log;
-
+import java.util.UUID;
 
 public class HeartBeatManager {
     private static HeartBeatManager inst;
@@ -37,6 +37,7 @@ public class HeartBeatManager {
                 byte[] enBytes = Tea.encrypt(content.getBytes(), key.getBytes());
                 //byte[] deBytes = Tea.decrypt(new String(enBytes).getBytes(),key.getBytes());
                 //Log.i("src content:"+new String(deBytes));
+                data.setId(UUID.randomUUID().toString());
                 data.setCmd(Message.Data.Cmd.HEARTBEAT_VALUE);
                 data.setContent(new String(enBytes));
                 data.setBody(ByteString.copyFrom(enBytes));
